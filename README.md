@@ -1,0 +1,1 @@
+This project is intended to work with audio using ESP32 board.
