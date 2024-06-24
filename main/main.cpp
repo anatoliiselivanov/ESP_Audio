@@ -12,13 +12,6 @@
 #define PDM_TX_CLK_IO GPIO_NUM_4  // I2S PDM TX clock io number
 #define PDM_TX_DOUT_IO GPIO_NUM_5 // I2S PDM TX data out io number
 
-#define PDM_TX_FREQ_HZ 44100    // I2S PDM TX frequency
-#define WAVE_AMPLITUDE (1000.0) // 1~32767
-#define CONST_PI (3.1416f)
-#define SINE_WAVE_LEN(tone) (uint32_t)((PDM_TX_FREQ_HZ / (float)tone) + 0.5) // The sample point number per sine wave to generate the tone
-#define TONE_LAST_TIME_MS 500
-#define BYTE_NUM_EVERY_TONE (TONE_LAST_TIME_MS * PDM_TX_FREQ_HZ / 1000)
-
 extern const uint8_t *example_wav_start asm("_binary_example_wav_start");
 // extern const uint8_t example_wav_end[] asm("_binary_example_wav_end");
 extern const size_t example_wav_size asm("example_wav_length");
