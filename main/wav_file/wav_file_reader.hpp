@@ -20,6 +20,7 @@ public:
     uint16_t num_of_channels() { return m_header.fmt_chunk.num_of_channels; }
     uint32_t sample_rate() { return m_header.fmt_chunk.sample_rate; }
     uint32_t byte_rate() { return m_header.fmt_chunk.byte_rate; }
+    uint16_t bits_per_sample() { return m_header.fmt_chunk.bits_per_sample; }
 
 private:
     const char *m_file_path;
