@@ -1,4 +1,4 @@
-idf_component_register(SRCS "main.cpp" "speaker/pdm_player.cpp" "wav_file/wav_file.cpp"
+idf_component_register(SRCS "main.cpp" "speaker/pdm_player.cpp" "wav_file/wav_file_reader.cpp"
                     INCLUDE_DIRS "." "speaker" "wav_file"
                     EMBED_FILES "../components/embedded_files/example.wav")
 
