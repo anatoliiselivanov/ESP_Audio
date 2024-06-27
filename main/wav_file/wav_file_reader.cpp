@@ -31,6 +31,11 @@ WavFileReader::WavFileReader(const uint8_t *data, size_t size)
     memcpy(m_data, data + sizeof(wav_header_t), m_data_size);
 }
 
+WavFileReader::~WavFileReader()
+{
+    delete[] m_data;
+}
+
 void WavFileReader::read_header()
 {
     fread(&m_header, sizeof(wav_header_t), 1, m_file);
