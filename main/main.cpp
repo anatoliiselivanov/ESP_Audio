@@ -5,7 +5,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
-#include "Speaker/PDM_Player.hpp"
+#include "speaker/PDM_Player.hpp"
 
 #define BUFF_SIZE 2048
 
