@@ -26,7 +26,7 @@ PDM_Player::PDM_Player(gpio_num_t clk_io, gpio_num_t data_io)
     };
 }
 
-void PDM_Player::play(uint8_t *buff, size_t size)
+void PDM_Player::play(const uint8_t *buff, size_t size)
 {
     WavFileReader wav_file(buff, size);
     if (!wav_file.is_valid())
@@ -51,7 +51,7 @@ void PDM_Player::init(uint32_t sample_rate = PDM_TX_FREQ_HZ, uint32_t bit_width 
     ESP_ERROR_CHECK(i2s_channel_enable(m_tx_chan));
 }
 
-void PDM_Player::play(uint16_t *buff, size_t size)
+void PDM_Player::play(const uint16_t *buff, size_t size)
 {
     ESP_ERROR_CHECK(i2s_channel_write(m_tx_chan, buff, size, NULL, portMAX_DELAY));
 }
