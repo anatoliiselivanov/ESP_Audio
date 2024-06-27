@@ -1,7 +1,7 @@
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 
-#include "PDM_Player.hpp"
+#include "pdm_player.hpp"
 
 #define PDM_TX_FREQ_HZ 44100    // I2S PDM TX frequency
 #define WAVE_AMPLITUDE (1000.0) // 1~32767
