@@ -29,11 +29,7 @@ PDM_Player::PDM_Player(gpio_num_t clk_io, gpio_num_t data_io)
 void PDM_Player::play(const uint8_t *buff, size_t size)
 {
     WavFileReader wav_file(buff, size);
-    if (!wav_file.is_valid())
-    {
-        ESP_LOGE("PDM_Player", "Invalid wav file");
-        return;
-    }
+
     init(wav_file.sample_rate(), wav_file.bits_per_sample(), wav_file.num_of_channels());
     play(wav_file.data(), wav_file.data_size());
 }
