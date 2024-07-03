@@ -1,10 +1,11 @@
+#include "pdm_player.hpp"
+
 #include "esp_err.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
-#include "pdm_player.hpp"
-
-#define PDM_TX_FREQ_HZ 44100    // I2S PDM TX frequency
+// #define PDM_TX_FREQ_HZ 44100    // I2S PDM TX frequency
+#define PDM_TX_FREQ_HZ 8000     // I2S PDM TX frequency
 #define WAVE_AMPLITUDE (1000.0) // 1~32767
 #define CONST_PI (3.1416f)
 #define SINE_WAVE_LEN(tone) (uint32_t)((PDM_TX_FREQ_HZ / (float)tone) + 0.5) // The sample point number per sine wave to generate the tone
@@ -24,30 +25,29 @@ PDM_Player::PDM_Player(gpio_num_t clk_io, gpio_num_t data_io)
             },
         },
     };
-}
 
-void PDM_Player::play(const uint8_t *buff, size_t size)
-{
-    WavFileReader wav_file(buff, size);
-
-    init(wav_file.sample_rate(), wav_file.bits_per_sample(), wav_file.num_of_channels());
-    play(wav_file.data(), wav_file.data_size());
-}
-
-void PDM_Player::init(uint32_t sample_rate = PDM_TX_FREQ_HZ, uint32_t bit_width = I2S_DATA_BIT_WIDTH_16BIT, uint32_t channel_num = I2S_SLOT_MODE_MONO)
-{
-    i2s_chan_config_t tx_chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
+    i2s_chan_config_t tx_chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
     tx_chan_cfg.auto_clear = true;
     ESP_ERROR_CHECK(i2s_new_channel(&tx_chan_cfg, &m_tx_chan, NULL));
-
-    m_pdm_tx_cfg.clk_cfg = I2S_PDM_TX_CLK_DEFAULT_CONFIG(sample_rate);
-    m_pdm_tx_cfg.slot_cfg = I2S_PDM_TX_SLOT_DEFAULT_CONFIG(i2s_data_bit_width_t(bit_width), i2s_slot_mode_t(channel_num));
 
     ESP_ERROR_CHECK(i2s_channel_init_pdm_tx_mode(m_tx_chan, &m_pdm_tx_cfg));
     ESP_ERROR_CHECK(i2s_channel_enable(m_tx_chan));
 }
 
-void PDM_Player::play(const uint16_t *buff, size_t size)
+void PDM_Player::play(const uint8_t *buff, size_t size)
 {
-    ESP_ERROR_CHECK(i2s_channel_write(m_tx_chan, buff, size, NULL, portMAX_DELAY));
+    size_t bytes_sent = 0;
+    for (size_t to_sent = 0; to_sent < size;)
+    {
+        ESP_ERROR_CHECK(i2s_channel_write(m_tx_chan, (void *)(buff + to_sent), 100 * sizeof(uint16_t), &bytes_sent, portMAX_DELAY));
+        to_sent += bytes_sent;
+    }
+}
+
+void PDM_Player::play(const std::vector<int16_t> &buff)
+{
+    for (const auto &val : buff)
+    {
+        ESP_ERROR_CHECK(i2s_channel_write(m_tx_chan, &val, sizeof(uint16_t), NULL, portMAX_DELAY));
+    }
 }
