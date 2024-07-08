@@ -4,12 +4,11 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
-// #define PDM_TX_FREQ_HZ 44100    // I2S PDM TX frequency
 #define PDM_TX_FREQ_HZ 8000     // I2S PDM TX frequency
 #define WAVE_AMPLITUDE (1000.0) // 1~32767
 #define CONST_PI (3.1416f)
 #define SINE_WAVE_LEN(tone) (uint32_t)((PDM_TX_FREQ_HZ / (float)tone) + 0.5) // The sample point number per sine wave to generate the tone
-#define TONE_LAST_TIME_MS 500
+#define TONE_LAST_TIME_MS 5                                                  // 00
 #define BYTE_NUM_EVERY_TONE (TONE_LAST_TIME_MS * PDM_TX_FREQ_HZ / 1000)
 
 PDM_Player::PDM_Player(gpio_num_t clk_io, gpio_num_t data_io)
@@ -31,17 +30,18 @@ PDM_Player::PDM_Player(gpio_num_t clk_io, gpio_num_t data_io)
     ESP_ERROR_CHECK(i2s_new_channel(&tx_chan_cfg, &m_tx_chan, NULL));
 
     ESP_ERROR_CHECK(i2s_channel_init_pdm_tx_mode(m_tx_chan, &m_pdm_tx_cfg));
-    ESP_ERROR_CHECK(i2s_channel_enable(m_tx_chan));
 }
 
 void PDM_Player::play(const uint8_t *buff, size_t size)
 {
+    ESP_ERROR_CHECK(i2s_channel_enable(m_tx_chan));
     size_t bytes_sent = 0;
     for (size_t to_sent = 0; to_sent < size;)
     {
-        ESP_ERROR_CHECK(i2s_channel_write(m_tx_chan, (void *)(buff + to_sent), 100 * sizeof(uint16_t), &bytes_sent, portMAX_DELAY));
+        ESP_ERROR_CHECK(i2s_channel_write(m_tx_chan, (void *)(buff + to_sent), BYTE_NUM_EVERY_TONE * sizeof(uint16_t), &bytes_sent, portMAX_DELAY));
         to_sent += bytes_sent;
     }
+    ESP_ERROR_CHECK(i2s_channel_disable(m_tx_chan));
 }
 
 void PDM_Player::play(const std::vector<int16_t> &buff)

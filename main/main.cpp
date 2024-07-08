@@ -23,10 +23,10 @@ void i2s_pdm_tx_task(void *args)
 
     while (1)
     {
-        printf("Playing the example wav file!\n"); // TODO: Replace this with ESP_LOGI
+        printf("Playing the example wav file!\n");
         pdm_player.play(wav_file_reader.data(), wav_file_reader.data_size());
 
-        vTaskDelay(15);
+        vTaskDelay(150);
     }
 
     vTaskDelete(NULL);
