@@ -30,8 +30,7 @@ public:
         return info.frame_bytes;
     }
 
-    template <typename SampleT>
-    size_t read(SampleT *samples, size_t number)
+    size_t read(SampleT *samples, size_t number) override
     {
         size_t read_size = mp3dec_decode_frame(&mp3d, m_input_buf, number * sizeof(SampleT), samples, &info);
         m_input_buf += read_size;
