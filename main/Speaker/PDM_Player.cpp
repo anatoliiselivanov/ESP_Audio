@@ -35,16 +35,18 @@ void PDM_Player::play(SoundFile *file)
 
     initialize(file->sample_rate());
 
-    size_t buff_size = TX_CHUNK_LENGTH_IN_BYTES(file->sample_rate());
+    size_t buff_size = TX_CHUNK_LENGTH(file->sample_rate());
     SoundFile::SampleT *buff = new SoundFile::SampleT[buff_size];
     size_t samples_read = 0;
 
-    while (samples_read >= buff_size)
+    do
     {
         samples_read = file->read(buff, buff_size);
         play(buff, samples_read);
-    }
+    } while (samples_read >= buff_size);
 
+    delete[] buff;
+    file->reset();
     deinitialize();
 }
 

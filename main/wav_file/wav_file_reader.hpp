@@ -27,36 +27,39 @@ public:
         return m_header.fmt_chunk.audio_format;
     }
 
-    uint16_t num_of_channels() const
+    uint16_t num_of_channels() const override
     {
         return m_header.fmt_chunk.num_of_channels;
     }
 
-    uint32_t sample_rate() const
+    uint32_t sample_rate() const override
     {
         return m_header.fmt_chunk.sample_rate;
     }
 
-    uint32_t byte_rate() const
+    uint32_t byte_rate() const override
     {
         return m_header.fmt_chunk.byte_rate;
     }
 
-    uint16_t bits_per_sample() const
+    uint16_t bits_per_sample() const override
     {
         return m_header.fmt_chunk.bits_per_sample;
     }
 
-    // TODO Implement read method
-    size_t read(SampleT *samples, size_t number) override
+    size_t read(SampleT *samples, size_t number) override;
+
+    void reset()
     {
-        return 0;
+        m_data_offset = 0;
     }
 
 private:
     wav_header_t m_header;
     const SampleT *m_data;
     size_t m_data_size;
+    SampleT *m_current_sample;
+    size_t m_data_offset = 0;
 };
 
 #endif // WAV_FILE_READER_HPP

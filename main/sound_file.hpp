@@ -15,5 +15,6 @@ public:
     virtual uint32_t byte_rate() const = 0;
     virtual uint16_t bits_per_sample() const = 0;
     virtual size_t read(SampleT *samples, size_t number) = 0;
+    virtual void reset() = 0;
 };
 #endif // SOUND_FILE_HPP
