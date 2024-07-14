@@ -1,5 +1,6 @@
 #include "speaker/pdm_player.hpp"
 #include "wav_file/wav_file_reader.hpp"
+#include "mp3_file/mp3_file_reader.hpp"
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -65,7 +66,8 @@ void i2s_pdm_tx_task(void *args)
 
     const uint8_t *ptr_to_example_wav_start = &example_wav_start;
 
-    SoundFile *wav_file_reader = new WavFileReader(ptr_to_example_wav_start, example_wav_size);
+    // SoundFile *sound_file = new WavFileReader(ptr_to_example_wav_start, example_wav_size);
+    SoundFile *sound_file = new Mp3FileReader(ptr_to_example_wav_start, example_wav_size);
     PDM_Player pdm_player(PDM_TX_CLK_IO, PDM_TX_DOUT_IO);
 
     while (1)
@@ -81,7 +83,7 @@ void i2s_pdm_tx_task(void *args)
 #else
         printf("Start playing the example wav file!\r\n");
 #endif
-        pdm_player.play(wav_file_reader);
+        pdm_player.play(sound_file);
         printf("File is finished\r\n");
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
