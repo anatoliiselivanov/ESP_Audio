@@ -10,8 +10,10 @@
 #include "esp_log.h"
 #include "driver/i2c.h"
 
-extern const uint8_t example_wav_start asm("_binary_example_wav_start");
-extern const size_t example_wav_size asm("example_wav_length");
+// extern const uint8_t example_wav_start asm("_binary_example_wav_start");
+// extern const size_t example_wav_size asm("example_wav_length");
+extern const uint8_t example_wav_start asm("_binary_test_mp3_start");
+extern const size_t example_wav_size asm("test_mp3_length");
 
 #define PDM_TX_CLK_IO GPIO_NUM_4  // I2S PDM TX clock io number
 #define PDM_TX_DOUT_IO GPIO_NUM_5 // I2S PDM TX data out io number
@@ -23,7 +25,7 @@ extern const size_t example_wav_size asm("example_wav_length");
 #define I2C_MASTER_TX_BUF_DISABLE 0  /*!< I2C master doesn't need buffer */
 #define I2C_MASTER_RX_BUF_DISABLE 0  /*!< I2C master doesn't need buffer */
 #define I2C_MASTER_TIMEOUT_MS 1000
-#define VOLUME_CONTROL 1
+// #define VOLUME_CONTROL 1
 
 #ifdef VOLUME_CONTROL
 
