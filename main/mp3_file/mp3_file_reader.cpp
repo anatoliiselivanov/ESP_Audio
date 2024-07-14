@@ -2,7 +2,7 @@
 
 const int BUFFER_SIZE = 1024;
 
-Mp3FileReader::Mp3FileReader(uint8_t *input_buf, size_t size)
+Mp3FileReader::Mp3FileReader(const uint8_t *input_buf, size_t size)
 {
     m_input_buf = input_buf;
 
