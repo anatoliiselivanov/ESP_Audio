@@ -1,7 +1,6 @@
 #include "pdm_player.hpp"
 
 #include "esp_err.h"
-#include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
 #define DEFAULT_FREQ 48'000
@@ -11,7 +10,6 @@
 
 PDM_Player::PDM_Player(gpio_num_t clk_io, gpio_num_t data_io) : m_clk_gpio{clk_io}, m_cdout_gpio{data_io}
 {
-
     i2s_chan_config_t tx_chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
     tx_chan_cfg.auto_clear = true;
     ESP_ERROR_CHECK(i2s_new_channel(&tx_chan_cfg, &m_tx_chan, NULL));

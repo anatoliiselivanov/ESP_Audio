@@ -58,7 +58,6 @@ private:
     wav_header_t m_header;
     const SampleT *m_data;
     size_t m_data_size;
-    SampleT *m_current_sample;
     size_t m_data_offset = 0;
 };
 
