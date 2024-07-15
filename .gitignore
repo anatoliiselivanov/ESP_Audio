@@ -1,6 +1,10 @@
 build
+managed_components
 .vscode/settings.json
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/settings.json
 .vscode/tasks.json
+dependencies.lock
+sdkconfig.old
+sdkconfig.old
