@@ -1,64 +1,30 @@
-#ifndef WAV_FILE_READER_HPP
-#define WAV_FILE_READER_HPP
+#pragma once
 
 #include "format_wav.h"
-
 #include "sound_file.hpp"
 
-class WavFileReader : public SoundFile
-{
-    using SampleT = int16_t;
-
+class WavFile : public SoundFile {
 public:
-    WavFileReader(const uint8_t *data, size_t size); // TODO Replace pointer with a shared pointer
-
-    const SampleT *samples() const
-    {
-        return m_data;
+    WavFile(const uint8_t *data, size_t size);
+    
+    SampleChunk getNextSampleChunk() override {
+        SampleChunk ret {
+            .samples = data_,
+            .length = data_size_,
+            .sample_rate = header_.fmt_chunk.sample_rate
+        };
+        return ret;
     }
 
-    size_t samples_number() const
-    {
-        return m_data_size;
+    eSoundFiles soundFileType() const override {
+        return eSoundFiles::SOUND_FILE_WAV;
     }
 
-    uint16_t audio_format() const
-    {
-        return m_header.fmt_chunk.audio_format;
+    void reset() {
+
     }
-
-    uint16_t num_of_channels() const override
-    {
-        return m_header.fmt_chunk.num_of_channels;
-    }
-
-    uint32_t sample_rate() const override
-    {
-        return m_header.fmt_chunk.sample_rate;
-    }
-
-    uint32_t byte_rate() const override
-    {
-        return m_header.fmt_chunk.byte_rate;
-    }
-
-    uint16_t bits_per_sample() const override
-    {
-        return m_header.fmt_chunk.bits_per_sample;
-    }
-
-    size_t read(SampleT *samples, size_t number) override;
-
-    void reset()
-    {
-        m_data_offset = 0;
-    }
-
 private:
-    wav_header_t m_header;
-    const SampleT *m_data;
-    size_t m_data_size;
-    size_t m_data_offset = 0;
+    wav_header_t header_{};
+    const SampleT *data_{};
+    size_t data_size_{};
 };
-
-#endif // WAV_FILE_READER_HPP

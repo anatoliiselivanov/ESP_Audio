@@ -1,48 +1,30 @@
-#ifndef MP3_FILE_READER_HPP
-#define MP3_FILE_READER_HPP
+#pragma once
 
+#include <vector>
 #include "sound_file.hpp"
-
 #include "minimp3.h"
 
-class Mp3FileReader : public SoundFile
+class Mp3File : public SoundFile
 {
 public:
-    Mp3FileReader(const uint8_t *data, size_t size);
+    Mp3File(const uint8_t *data, size_t size);
 
-    uint16_t num_of_channels() const override
-    {
-        return info.channels;
+    eSoundFiles soundFileType() const override {
+        return eSoundFiles::SOUND_FILE_MP3;
     }
 
-    uint32_t sample_rate() const override
-    {
-        return info.hz;
-    }
+    SampleChunk getNextSampleChunk() override;
 
-    uint32_t byte_rate() const override
-    {
-        return info.bitrate_kbps * 1000 / 8;
-    }
-
-    uint16_t bits_per_sample() const override
-    {
-        return info.frame_bytes;
-    }
-
-    size_t read(SampleT *samples, size_t number) override;
-
-    void reset()
-    {
-        m_data_offset = 0;
+    void reset() {
+        data_offset_ = 0;
     }
 
 private:
-    mp3dec_t mp3d = {};
-    mp3dec_frame_info_t info = {};
-    const uint8_t *m_data;
-    size_t m_data_size;
-    size_t m_data_offset = 0;
+    static constexpr const char* const TAG{"Mp3File"};
+    SampleT* samples_{nullptr};  
+    mp3dec_t mp3d_{};
+    mp3dec_frame_info_t frame_info_{};
+    const uint8_t *data_{nullptr};
+    size_t data_offset_{};
+    SampleChunk curr_chunk_{};
 };
-
-#endif // MP3_FILE_READER_HPP

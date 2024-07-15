@@ -10,13 +10,19 @@
 #include "esp_log.h"
 #include "driver/i2c.h"
 
-// extern const uint8_t example_wav_start asm("_binary_example_wav_start");
-// extern const size_t example_wav_size asm("example_wav_length");
-extern const uint8_t example_wav_start asm("_binary_test_mp3_start");
-extern const size_t example_wav_size asm("test_mp3_length");
+
+
+extern const uint8_t wav_file_start asm("_binary_test_wav_start");
+extern const size_t wav_file_len asm("test_wav_length");
+static const char* const wav_file_format{"wav"};
+
+extern const uint8_t mp3_file_start asm("_binary_test_mp3_start");
+extern const size_t mp3_file_len asm("test_mp3_length");
+static const char* const mp3_file_format{"mp3"};
+
 
 #define PDM_TX_CLK_IO GPIO_NUM_4  // I2S PDM TX clock io number
-#define PDM_TX_DOUT_IO GPIO_NUM_5 // I2S PDM TX data out io number
+#define PDM_TX_DOUT_IO GPIO_NUM_6 // I2S PDM TX data out io number
 
 #define I2C_MASTER_SCL_IO GPIO_NUM_2 /*!< GPIO number used for I2C master clock */
 #define I2C_MASTER_SDA_IO GPIO_NUM_1 /*!< GPIO number used for I2C master data  */
@@ -66,16 +72,14 @@ void i2s_pdm_tx_task(void *args)
     ESP_LOGI("I2C", "I2C initialized successfully");
 #endif
 
-    const uint8_t *ptr_to_example_wav_start = &example_wav_start;
+    SoundFile *sound_file_wav = new WavFile(&wav_file_start, wav_file_len);
+    SoundFile *sound_file_mp3 = new Mp3File(&mp3_file_start, mp3_file_len);
 
-    // SoundFile *sound_file = new WavFileReader(ptr_to_example_wav_start, example_wav_size);
-    SoundFile *sound_file = new Mp3FileReader(ptr_to_example_wav_start, example_wav_size);
     PDM_Player pdm_player(PDM_TX_CLK_IO, PDM_TX_DOUT_IO);
-
     while (1)
     {
 #ifdef VOLUME_CONTROL
-        printf("Playing the example wav file with volume = %d\n", (int)volume);
+        printf("Playing the example file with volume = %d\n", (int)volume);
         ESP_ERROR_CHECK(amplifier_set_volume(volume));
         volume -= 5;
         if (volume <= 0)
@@ -83,18 +87,23 @@ void i2s_pdm_tx_task(void *args)
             volume = MAX_VOLUME;
         }
 #else
-        printf("Start playing the example wav file!\r\n");
-#endif
-        pdm_player.play(sound_file);
+        printf("Start playing wav sound file!\r\n");
+        pdm_player.play(sound_file_wav);
+        printf("File is finished\r\n");
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        
+        printf("Start playing mp3 sound file!\r\n");
+        pdm_player.play(sound_file_mp3);
         printf("File is finished\r\n");
         vTaskDelay(pdMS_TO_TICKS(1000));
+#endif
     }
-
     vTaskDelete(NULL);
 }
 
 extern "C" void app_main(void)
 {
     printf("Start the program\r\n");
-    xTaskCreate(i2s_pdm_tx_task, "i2s_pdm_tx_task", 4096, NULL, 5, NULL);
+    xTaskCreate(i2s_pdm_tx_task, "i2s_pdm_tx_task", 120000, NULL, 5, NULL);
 }
