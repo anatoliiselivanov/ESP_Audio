@@ -3,7 +3,7 @@
 
 #include "driver/i2s_pdm.h"
 #include "driver/gpio.h"
-#include "wav_file_reader.hpp"
+#include "sound_file.hpp"
 
 #include <vector>
 
@@ -11,7 +11,8 @@ class PDM_Player
 {
 public:
     PDM_Player(gpio_num_t clk_io, gpio_num_t data_io);
-    void play(const WavFileReader* wav);
+    void play(SoundFile *file);
+
 private:
     void play(const int16_t *samples, size_t size);
     void play(const std::vector<int16_t> &samples);
