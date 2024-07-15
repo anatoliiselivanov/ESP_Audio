@@ -2,18 +2,41 @@
 #define MINIMP3_ONLY_MP3
 #define MINIMP3_NO_STDIO
 
-// #include "minimp3.h"
-
 #include "mp3_file_reader.hpp"
+
+#include <stdio.h>
 
 const int BUFFER_SIZE = 1024;
 
-Mp3FileReader::Mp3FileReader(const uint8_t *input_buf, size_t size)
+Mp3FileReader::Mp3FileReader(const uint8_t *data, size_t size)
 {
-    m_input_buf = input_buf;
+    m_data = data;
+    m_data_size = size;
+
+    // Get info from the mp3 file
+    mp3dec_decode_frame(&mp3d, m_data, BUFFER_SIZE, nullptr, &info);
 
     // mp3 decoder state
     mp3dec_init(&mp3d);
+}
+
+size_t Mp3FileReader::read(SampleT *samples, size_t number)
+{
+    size_t read_size = number * sizeof(SampleT);
+
+    if (m_data_offset + read_size > m_data_size)
+    {
+        read_size = m_data_size - m_data_offset;
+    }
+
+    mp3dec_decode_frame(&mp3d, m_data + m_data_offset, number * sizeof(SampleT), samples, &info);
+    m_data_offset += read_size;
+
+    return read_size / sizeof(SampleT);
+}
+
+size_t Mp3FileReader::read()
+{
 }
 
 // void play_task(void *param)

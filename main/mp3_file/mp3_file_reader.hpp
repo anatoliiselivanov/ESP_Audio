@@ -8,7 +8,7 @@
 class Mp3FileReader : public SoundFile
 {
 public:
-    Mp3FileReader(const uint8_t *input_buf, size_t size);
+    Mp3FileReader(const uint8_t *data, size_t size);
 
     uint16_t num_of_channels() const override
     {
@@ -30,22 +30,19 @@ public:
         return info.frame_bytes;
     }
 
-    size_t read(SampleT *samples, size_t number) override
-    {
-        size_t read_size = mp3dec_decode_frame(&mp3d, m_input_buf, number * sizeof(SampleT), samples, &info);
-        m_input_buf += read_size;
-        return read_size / sizeof(SampleT);
-    }
+    size_t read(SampleT *samples, size_t number) override;
 
     void reset()
     {
-        mp3dec_init(&mp3d);
+        m_data_offset = 0;
     }
 
 private:
     mp3dec_t mp3d = {};
     mp3dec_frame_info_t info = {};
-    const uint8_t *m_input_buf;
+    const uint8_t *m_data;
+    size_t m_data_size;
+    size_t m_data_offset = 0;
 };
 
 #endif // MP3_FILE_READER_HPP
