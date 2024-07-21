@@ -1,1 +1,7 @@
 build
+components/espressif_libsodium
+
+sdkconfig
+sdkconfig.old
+.vscode/settings.json
+sdkconfig

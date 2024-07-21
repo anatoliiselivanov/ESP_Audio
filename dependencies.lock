@@ -1,0 +1,15 @@
+dependencies:
+  espressif/libsodium:
+    component_hash: null
+    source:
+      path: C:\Anatolii\Projects\Smart_Oven\ESP_Audio\components\espressif__libsodium
+      type: local
+    version: 1.0.20~1
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.1.4
+manifest_hash: a2f07987fc4db7f16293eea1c3a7a681c51176570bef42f879b476d756d94474
+target: esp32
+version: 1.0.0
