@@ -2,52 +2,51 @@
 #include <string.h>
 #include "esp_mac.h"
 #include "sodium.h"
+#include <memory.h>
 
-void app_main(void)
+void experiment_2()
 {
-    // Initialize the library
-    if (sodium_init() < 0)
+    if (sodium_init() == -1)
     {
         printf("Failed to initialize libsodium\n");
         return;
     }
 
-    printf("libsodium initialized\n");
+    unsigned char device_private_key[crypto_kx_SECRETKEYBYTES];
+    unsigned char device_public_key[crypto_kx_PUBLICKEYBYTES];
+    unsigned char cloud_private_key[crypto_kx_SECRETKEYBYTES];
+    unsigned char cloud_public_key[crypto_kx_PUBLICKEYBYTES];
 
-    // Generate a random key
-    unsigned char key[crypto_aead_xchacha20poly1305_ietf_KEYBYTES];
-    crypto_aead_xchacha20poly1305_ietf_keygen(key);
+    // Generate private keys
+    crypto_aead_xchacha20poly1305_ietf_keygen(device_private_key);
+    crypto_aead_xchacha20poly1305_ietf_keygen(cloud_private_key);
 
-    printf("Key generated\n");
+    // Get public keys
+    crypto_sign_ed25519_sk_to_pk(device_public_key, device_private_key);
+    crypto_sign_ed25519_sk_to_pk(cloud_private_key, cloud_private_key);
 
-    // Encrypt a message
-    const unsigned char *message = (const unsigned char *)"Hello, World!";
-    unsigned char nonce[crypto_aead_xchacha20poly1305_ietf_NPUBBYTES];
-    unsigned char ciphertext[1024];
-    unsigned long long ciphertext_len;
-
-    randombytes_buf(nonce, sizeof(nonce));
-    crypto_aead_xchacha20poly1305_ietf_encrypt(ciphertext, &ciphertext_len,
-                                               message, strlen((const char *)message),
-                                               NULL, 0, NULL, nonce, key);
-
-    printf("Message encrypted\n");
-
-    // Decrypt the message
-    unsigned char decrypted[1024];
-    unsigned long long decrypted_len;
-    int ret = crypto_aead_xchacha20poly1305_ietf_decrypt(decrypted, &decrypted_len,
-                                                         NULL, ciphertext, ciphertext_len,
-                                                         NULL, 0, nonce, key);
-
-    if (ret == 0)
+    // Generate common key
+    unsigned char shared_secret_1[crypto_scalarmult_BYTES];
+    if (crypto_scalarmult(shared_secret_1, device_private_key, cloud_public_key) != 0)
     {
-        printf("Decrypted message: %s\n", decrypted);
+        printf("Failed to generate shared secret\n");
+        return;
     }
+
+    unsigned char shared_secret_2[crypto_scalarmult_BYTES];
+    if (crypto_scalarmult(shared_secret_2, device_private_key, cloud_public_key) != 0)
+    {
+        printf("Failed to generate shared secret\n");
+        return;
+    }
+
+    if (memcmp(shared_secret_1, shared_secret_2, crypto_scalarmult_BYTES) == 0)
+        printf("Shared secrets are equal\n");
     else
-    {
-        printf("Failed to decrypt message\n");
-    }
+        printf("Shared secrets are not equal\n");
+}
 
-    return;
+void app_main(void)
+{
+    experiment_2();
 }
